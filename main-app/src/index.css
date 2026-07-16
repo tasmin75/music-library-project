@@ -1,0 +1,40 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-deck-bg text-deck-cream font-body antialiased;
+  }
+
+  ::selection {
+    @apply bg-deck-amber/30 text-deck-cream;
+  }
+
+  *:focus-visible {
+    outline: 2px solid theme("colors.deck.amber");
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .field-input {
+    @apply w-full rounded-sm border border-deck-line bg-deck-panel px-3 py-2 text-sm text-deck-cream placeholder:text-deck-muted/60 focus:border-deck-amber outline-none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
