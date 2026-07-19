@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Set VITE_REMOTE_URL in Netlify's site environment variables to the
+# deployed music-library origin (e.g. https://music-library-xyz.netlify.app)
+# before triggering a build — it's baked in at build time.
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
