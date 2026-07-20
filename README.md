@@ -68,6 +68,9 @@ npm install
 ```
 in whichever folder it happens in.
 
+**`POST /songs` (or `PUT`/`DELETE`) returns a 404 against the host's own port (e.g. `http://localhost:5173/songs`) instead of being intercepted.**
+This means MSW's service worker never registered on the host's origin — check that `mockServiceWorker.js` exists in **both** `main-app/public/` and `music-library/public/`, and that they're byte-identical (same MSW version). See "How the micro frontend works" above for why this has to be duplicated rather than living in just one place.
+
 ## Deployment
 
 Both apps deploy as static sites (Netlify, Vercel, or GitHub Pages all work — `netlify.toml` is included in both folders).
@@ -89,7 +92,9 @@ const RemoteMusicLibrary = lazy(() => import("music_library/MusicLibrary"));
 
 wrapped in a `Suspense` boundary (loading state) and a class-based error boundary (in case the remote is unreachable — down, redeploying, or a stale/wrong URL). `react` and `react-dom` are marked as shared singletons in both Vite configs so the host and remote don't ship or run two separate React copies.
 
-The exposed component carries its own `QueryClientProvider` and starts its own MSW worker on mount, so it works correctly whether it's mounted inside the host or run completely standalone — it doesn't assume the host has set either of those up for it.
+The exposed component carries its own `QueryClientProvider` and starts its own MSW worker on mount, so it works correctly whether it's mounted inside the host or run completely standalone.
+
+One non-obvious gotcha this surfaced: MSW intercepts network requests via a Service Worker, and a Service Worker's scope is tied to whatever **origin the document itself was loaded from** — not to which federated module's JS happened to call `worker.start()`. When `MusicLibrary` runs inside `main-app`, the code executes in the remote's bundle, but the *page* is `main-app`'s, so MSW tries to register `mockServiceWorker.js` against `main-app`'s origin. That file only existed in `music-library/public/` at first, so registration silently failed there, and `POST /songs` fell through to the real network and 404'd against the host's own dev server instead of being intercepted. **Fix:** the identical `mockServiceWorker.js` is committed in both apps' `public/` folders — `music-library/public/` (for the standalone remote) and `main-app/public/` (for when it's loaded through federation). Both must stay on the same MSW version, or the worker script and the client library disagree about the wire protocol.
 
 **CSS is the one thing Module Federation doesn't share.** It shares JS modules; it has no equivalent for "also inject this stylesheet." So `music-library`'s Vite config disables CSS code-splitting and pins the output filename to `style.css`, and the host fetches `${VITE_REMOTE_URL}/style.css` directly and appends it as a `<link>` tag the first time the remote mounts (`main-app/src/components/RemoteLibrary.jsx`).
 
