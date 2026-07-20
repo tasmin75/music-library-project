@@ -9,8 +9,8 @@ Two apps live in this repo:
 
 ## Live demos
 
-- Main app: _add your deployed URL here_
-- Music Library (standalone): _add your deployed URL here_
+- Main app: https://agent-6a5dc1c1add1946--music-library-application.netlify.app
+- Music Library (standalone): https://agent-6a5dc1c1add1946--music-library-application.netlify.app
 
 ## Demo credentials
 
@@ -19,7 +19,6 @@ Two apps live in this repo:
 | `admin`    | `admin123`    | admin | View, filter/sort/group, add, edit, and remove tracks added this session |
 | `listener` | `listener123` | user  | View, filter/sort/group only            |
 
-These are hardcoded in `main-app/src/auth/AuthContext.jsx` — there's no real backend behind them, per the brief.
 
 ## Running locally
 
@@ -31,7 +30,7 @@ Requires Node 18+ (tested on 20.17 and 22). You need both apps running, in this 
 cd music-library
 npm install
 npm run build
-npm run preview   # serves dist/ on http://localhost:5175
+npm run preview  
 ```
 
 Leave that running. `npm run dev` alone is *not* enough here — Module Federation with this plugin resolves the remote's built `remoteEntry.js`, not its dev server, so the remote needs an actual build.
@@ -41,7 +40,7 @@ Leave that running. `npm run dev` alone is *not* enough here — Module Federati
 ```bash
 cd main-app
 npm install
-cp .env.example .env   # already points at http://localhost:5175, the default
+cp .env.example .env  
 npm run dev            # http://localhost:5173
 ```
 
@@ -55,5 +54,3 @@ Both apps have a `test` script (`npm test` in either folder, powered by Vitest):
 
 - `music-library`: `songUtils.test.js` covers the filter/sort/group-by logic; `songsStore.test.js` covers the mock backend's create/update/delete behavior directly, including the 404-on-an-id-it-doesn't-own case.
 - `main-app`: `mockJwt.test.js` covers token issuing, decoding, and expiry.
-
-These aren't exhaustive (no component-level or end-to-end tests), but they cover the parts of the logic that are easiest to get subtly wrong and hardest to catch just by clicking through the UI.
